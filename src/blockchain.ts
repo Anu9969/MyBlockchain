@@ -44,6 +44,22 @@ export const generateNewBlock = (data:string): Block =>{
     const timestamp = Math.round(new Date().getTime() / 1000);
     const hash = calculateHash(nextIndex,previousHash,timestamp,data);
     const newBlock = new Block(nextIndex,data,hash,previousHash,timestamp);
-    blockchain.push(newBlock);
+    blockchain.push(newBlock); //aise nhi krna ,pehle validate then the block should be added to the chain
     return newBlock;
+}
+
+export const isBlockValid = (newBlock:Block , previousBlock:Block):boolean =>{
+    if (previousBlock.index + 1 !== newBlock.index){
+        console.log("Invalid index");
+        return false;
+    }
+    if (previousBlock.hash !== newBlock.previousHash){
+        console.log("Invalid previous hash");
+        return false;
+    }
+    if( newBlock.hash !== calculateHash(newBlock.index, newBlock.previousHash, newBlock.timestamp, newBlock.data)){
+        console.log("Invalid hash");
+        return false;
+    }
+    return true;
 }
