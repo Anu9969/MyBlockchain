@@ -30,3 +30,20 @@ export const genesisBlock = () => {
 
 let blockchain: Block[] = [genesisBlock()];
 
+// export const getBlockchain = () => {
+//     return blockchain;
+// }
+
+export const getBlockchain = ():Block[] => blockchain;
+
+export const getLatestBlock = ():Block => blockchain[blockchain.length - 1];
+
+export const generateNewBlock = (data:string): Block =>{
+    const previousHash = getLatestBlock().hash;
+    const nextIndex = getLatestBlock().index + 1;
+    const timestamp = Math.round(new Date().getTime() / 1000);
+    const hash = calculateHash(nextIndex,previousHash,timestamp,data);
+    const newBlock = new Block(nextIndex,data,hash,previousHash,timestamp);
+    blockchain.push(newBlock);
+    return newBlock;
+}
