@@ -1,5 +1,4 @@
 import express from 'express';
-import path from 'path';
 import cors from 'cors';
 import { 
     Block, 
@@ -11,17 +10,16 @@ import {
     addBlock, 
     isChainValid, 
     replaceChain 
-} from './blockchain';
+} from '../src/blockchain';
 
 const app = express();
-const PORT = process.env.PORT || 3000;
 
 // Middleware
 app.use(cors());
 app.use(express.json());
 
 // API Routes
-app.get('/blockchain', (req, res) => {
+app.get('/api/blockchain', (req, res) => {
     try {
         const blockchain = getBlockchain();
         res.json({ blockchain });
@@ -30,7 +28,7 @@ app.get('/blockchain', (req, res) => {
     }
 });
 
-app.get('/latest-block', (req, res) => {
+app.get('/api/latest-block', (req, res) => {
     try {
         const block = getLatestBlock();
         res.json({ block });
@@ -39,7 +37,7 @@ app.get('/latest-block', (req, res) => {
     }
 });
 
-app.post('/add-block', (req, res) => {
+app.post('/api/add-block', (req, res) => {
     try {
         const { data } = req.body;
         
@@ -58,7 +56,7 @@ app.post('/add-block', (req, res) => {
     }
 });
 
-app.get('/validate-chain', (req, res) => {
+app.get('/api/validate-chain', (req, res) => {
     try {
         const blockchain = getBlockchain();
         const isValid = isChainValid(blockchain);
@@ -68,7 +66,7 @@ app.get('/validate-chain', (req, res) => {
     }
 });
 
-app.post('/run-tests', (req, res) => {
+app.post('/api/run-tests', (req, res) => {
     try {
         // Run comprehensive tests
         const results = [];
@@ -100,7 +98,7 @@ app.post('/run-tests', (req, res) => {
     }
 });
 
-app.get('/test-genesis', (req, res) => {
+app.get('/api/test-genesis', (req, res) => {
     try {
         const genesis = genesisBlock();
         const message = `Genesis Block created successfully!<br>
@@ -116,7 +114,7 @@ app.get('/test-genesis', (req, res) => {
     }
 });
 
-app.get('/test-validation', (req, res) => {
+app.get('/api/test-validation', (req, res) => {
     try {
         const blockchain = getBlockchain();
         const isValid = isChainValid(blockchain);
@@ -138,7 +136,7 @@ app.get('/test-validation', (req, res) => {
     }
 });
 
-app.post('/clear-blockchain', (req, res) => {
+app.post('/api/clear-blockchain', (req, res) => {
     try {
         // Reset blockchain to only genesis block
         const genesis = genesisBlock();
@@ -152,23 +150,9 @@ app.post('/clear-blockchain', (req, res) => {
     }
 });
 
-// Serve the HTML page
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, '../public/index.html'));
-});
-
 // Health check endpoint
-app.get('/health', (req, res) => {
+app.get('/api/health', (req, res) => {
     res.json({ status: 'OK', message: 'Blockchain API is running' });
 });
-
-// Start server (only in development)
-if (process.env.NODE_ENV !== 'production') {
-    app.listen(PORT, () => {
-        console.log(`🚀 Blockchain server running on http://localhost:${PORT}`);
-        console.log(`📊 Web interface available at http://localhost:${PORT}`);
-        console.log(`🔗 API endpoints available at http://localhost:${PORT}/`);
-    });
-}
 
 export default app; 

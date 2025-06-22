@@ -291,7 +291,9 @@
     </div>
 
     <script>
-        const API_BASE = 'http://localhost:3000';
+        // Detect if we're on Vercel or local development
+        const isVercel = window.location.hostname.includes('vercel.app') || window.location.hostname.includes('now.sh');
+        const API_BASE = isVercel ? window.location.origin : 'http://localhost:3000';
 
         // Utility functions
         function showLoading() {
@@ -351,7 +353,7 @@
             hideResult('addBlockResult');
 
             try {
-                const result = await makeRequest('/add-block', 'POST', { data });
+                const result = await makeRequest('/api/add-block', 'POST', { data });
                 showResult('addBlockResult', `✅ Block added successfully!<br>Block Index: ${result.block.index}<br>Hash: ${result.block.hash}`, true);
                 document.getElementById('blockData').value = '';
                 updateStats();
@@ -368,7 +370,7 @@
             hideResult('operationsResult');
 
             try {
-                const result = await makeRequest('/blockchain');
+                const result = await makeRequest('/api/blockchain');
                 showResult('operationsResult', `✅ Blockchain retrieved successfully!<br>Total blocks: ${result.blockchain.length}`, true);
                 updateStats();
             } catch (error) {
@@ -383,7 +385,7 @@
             hideResult('operationsResult');
 
             try {
-                const result = await makeRequest('/latest-block');
+                const result = await makeRequest('/api/latest-block');
                 const block = result.block;
                 showResult('operationsResult', 
                     `✅ Latest Block:<br>
@@ -404,7 +406,7 @@
             hideResult('operationsResult');
 
             try {
-                const result = await makeRequest('/validate-chain');
+                const result = await makeRequest('/api/validate-chain');
                 const status = result.isValid ? '✅ Valid' : '❌ Invalid';
                 showResult('operationsResult', `${status} Chain Validation Result: ${result.isValid}`, result.isValid);
             } catch (error) {
@@ -419,7 +421,7 @@
             hideResult('testResult');
 
             try {
-                const result = await makeRequest('/run-tests');
+                const result = await makeRequest('/api/run-tests');
                 showResult('testResult', `✅ Tests completed successfully!<br>${result.message}`, true);
                 updateStats();
                 refreshDisplay();
@@ -435,7 +437,7 @@
             hideResult('testResult');
 
             try {
-                const result = await makeRequest('/test-genesis');
+                const result = await makeRequest('/api/test-genesis');
                 showResult('testResult', `✅ Genesis Block Test:<br>${result.message}`, true);
             } catch (error) {
                 showResult('testResult', `❌ Error: ${error.message}`, false);
@@ -449,7 +451,7 @@
             hideResult('testResult');
 
             try {
-                const result = await makeRequest('/test-validation');
+                const result = await makeRequest('/api/test-validation');
                 showResult('testResult', `✅ Block Validation Test:<br>${result.message}`, true);
             } catch (error) {
                 showResult('testResult', `❌ Error: ${error.message}`, false);
@@ -467,7 +469,7 @@
             hideResult('testResult');
 
             try {
-                const result = await makeRequest('/clear-blockchain', 'POST');
+                const result = await makeRequest('/api/clear-blockchain', 'POST');
                 showResult('testResult', `✅ Blockchain cleared! ${result.message}`, true);
                 updateStats();
                 refreshDisplay();
@@ -482,7 +484,7 @@
             showLoading();
 
             try {
-                const result = await makeRequest('/blockchain');
+                const result = await makeRequest('/api/blockchain');
                 const blockchain = result.blockchain;
                 
                 let display = '';
@@ -509,14 +511,14 @@
 
         async function updateStats() {
             try {
-                const result = await makeRequest('/blockchain');
+                const result = await makeRequest('/api/blockchain');
                 const blockchain = result.blockchain;
                 
                 document.getElementById('blockCount').textContent = blockchain.length;
                 document.getElementById('lastBlockIndex').textContent = blockchain.length > 0 ? blockchain[blockchain.length - 1].index : 0;
                 
                 // Check chain validity
-                const validityResult = await makeRequest('/validate-chain');
+                const validityResult = await makeRequest('/api/validate-chain');
                 document.getElementById('chainStatus').textContent = validityResult.isValid ? 'Valid' : 'Invalid';
                 document.getElementById('chainStatus').style.color = validityResult.isValid ? '#27ae60' : '#e74c3c';
             } catch (error) {
